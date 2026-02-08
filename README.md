@@ -1,47 +1,88 @@
-# 🩺 Pima Indians Diabetes Prediction — End-to-End ML Project
+# 🩺 Pima Diabetes Prediction — Cost-Aware Pipeline
 
-A compact, production-minded pipeline to predict diabetes risk from routine clinical measurements (Pima Indians dataset).  
-Covers **data cleaning → EDA → feature engineering → modeling → calibration & cost-aware threshold → interpretation → deployable artifacts**.
+A compact, production-minded workflow to predict diabetes risk from routine clinical measurements with
+probability calibration and an explicit threshold policy.
 
----
-
-## 🚀 Main Steps
-
-**Data Cleaning**
-- Replace impossible zeros in medical columns (`Glucose`, `BloodPressure`, `SkinThickness`, `Insulin`, `BMI`) with `NaN`.
-- Median imputation (robust to outliers). Remove duplicates.
-
-**Feature Engineering**
-- Age groups, BMI categories.
-- Interactions: `Age×BMI`, `Glucose×BMI`, `Pregnancies/Age`.
-- All transformations inside a **leakage-safe Pipeline**.
-
-**EDA & Visualization**
-- Class imbalance: ~65% non-diabetic vs ~35% diabetic.
-- Correlation: **Glucose** strongest with outcome; diabetics tend to have higher **Glucose/BMI/Age**.
-- Plotly: Glucose vs BMI clusters by outcome.
-
-**Modeling**
-- Baseline: Dummy.  
-- Models: **Logistic Regression, Random Forest** (XGBoost if available).  
-- **Imbalance**: SMOTE and/or class weights.  
-- **5-fold Stratified CV** with Accuracy, Precision, Recall, F1, ROC-AUC.
-
-**Threshold & Calibration (Pro touch)**
-- Tune threshold on validation (maximize **F1** for screening).  
-- **Isotonic calibration** + **Reliability plot** for trustworthy probabilities.  
-- **Cost Curve** to pick an **operating threshold** minimizing expected cost (typically `Cost_FN > Cost_FP`).
-
-**Interpretation**
-- **Permutation importance**: key drivers typically **Glucose, BMI, Age, Pregnancies**.
-- Learning curves for data sufficiency.
-
-**Deployment Artifacts**
-- Export single `joblib` bundle: pipeline + features + thresholds (validation & operating).
+Case study: `CASE_STUDY.md`
 
 ---
 
-## 📦 Artifacts
-- `artifacts/pima_best_pipeline.joblib`  
-  Includes preprocessing, feature engineering, SMOTE, classifier, **validation threshold**, **operating threshold**, feature list, and CV summary.
+## What this repository includes
+- Main notebook: `diabetes-prediction-from-eda-to-production.ipynb`
+- Optional reference notebook: `pima-indians-diabetes-database.ipynb`
+- Exported artifacts under `./artifacts/`
+- Optional scoring script: `scripts/predict.py`
 
+---
+
+## Dataset
+Source: Kaggle “Pima Indians Diabetes Database” (`diabetes.csv`).
+
+Expected columns (typical):
+- `Pregnancies`, `Glucose`, `BloodPressure`, `SkinThickness`, `Insulin`, `BMI`, `DiabetesPedigreeFunction`, `Age`, `Outcome`
+
+### Local (recommended)
+1) Download the dataset CSV.
+2) Place it at:
+`data/raw/diabetes.csv`
+
+### Kaggle
+The notebook also supports:
+`/kaggle/input/pima-indians-diabetes-database/diabetes.csv`
+
+---
+
+## Getting started
+
+### 1) Install
+```bash
+python -m venv .venv
+# Windows: .\.venv\Scripts\activate
+# macOS/Linux: source .venv/bin/activate
+
+pip install -r requirements.txt
+```
+
+### 2) Run the notebook
+Open and run:
+- `diabetes-prediction-from-eda-to-production.ipynb`
+
+The notebook will:
+- clean and audit the dataset
+- train models and calibrate probabilities
+- select an operating threshold (policy)
+- export `artifacts/pima_best_pipeline.joblib`
+
+---
+
+## Artifacts
+The exported bundle includes:
+- trained pipeline
+- operating threshold
+- run metadata
+
+See `artifacts/README.md`.
+
+---
+
+## Score a CSV (optional)
+After exporting artifacts, you can score a CSV:
+
+```bash
+python scripts/predict.py --csv data/raw/diabetes.csv --out artifacts/scored.csv
+```
+
+The output adds:
+- `diabetes_proba`
+- `diabetes_pred`
+
+---
+
+## Methodology notes
+- Probability calibration makes thresholds usable for decisions.
+- Threshold policy is selected on validation and exported with the artifact.
+
+---
+
+## License
+MIT (code). Dataset licensing depends on the dataset source where you download it.

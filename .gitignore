@@ -7,3 +7,7 @@ __pycache__/
 env/
 venv/
 ENV/
+# Data and generated outputs
+/data/raw/*.csv
+/artifacts/*.joblib
+/artifacts/*.csv
