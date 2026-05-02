@@ -2,7 +2,7 @@
 
 A clean Kaggle + GitHub machine-learning project for the **Pima Diabetes** benchmark, focused on leakage-safe preprocessing, model comparison, calibrated probabilities, validation-based threshold selection, and a reusable scoring artifact.
 
-> ⚕️ **Scope:** this is a benchmark ML workflow for reproducible analysis and portfolio demonstration. It is **not** a clinical recommendation or medical decision system.
+> ⚕️ **Scope:** this is a benchmark ML workflow for reproducible analysis and model evaluation. It is **not** a clinical recommendation or medical decision system.
 
 ---
 
