@@ -1,6 +1,10 @@
 # artifacts
 
-This folder is used for generated outputs from the notebook (not committed by default).
+Generated outputs from the notebook live here.
 
-Typical output:
-- `pima_best_pipeline.joblib` — a bundle containing the trained pipeline, selected operating threshold, and run metadata.
+Typical generated files:
+
+- `pima_best_pipeline.joblib` — calibrated pipeline bundle with selected threshold and run metadata
+- `scored.csv` — optional scoring output from `scripts/predict.py`
+
+These generated files are ignored by git by default.

@@ -1,9 +1,11 @@
 # data/raw
 
-Place the dataset CSV here (not committed to the repository).
+Place the dataset CSV here for local runs.
 
 Recommended filename:
-- `data/raw/diabetes.csv`
 
-Kaggle notebook path used by the notebook:
-- `/kaggle/input/pima-indians-diabetes-database/diabetes.csv`
+```text
+data/raw/diabetes.csv
+```
+
+The notebook also supports common Kaggle input paths and validates the expected schema before modeling.

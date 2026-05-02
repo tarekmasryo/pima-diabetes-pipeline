@@ -4,9 +4,13 @@ __pycache__/
 *.pyo
 *.pyd
 .Python
+
+# Virtual environments
 env/
 venv/
+.venv/
 ENV/
+
 # Data and generated outputs
 /data/raw/*.csv
 /artifacts/*.joblib

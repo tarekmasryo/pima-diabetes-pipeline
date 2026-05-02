@@ -1,63 +1,68 @@
-# Case Study — Pima Diabetes Pipeline (Decision-Grade Classification)
+# Case Study — Pima Diabetes Leakage-Safe ML Pipeline
 
 ## Overview
-This repository provides a compact, production-minded workflow to predict diabetes risk from routine clinical measurements:
-EDA → preprocessing → model training → probability calibration → threshold policy → exportable artifacts.
 
-The goal is not just a good score, but a decision policy that controls false positives vs false negatives.
+This repository demonstrates a compact, decision-aware machine-learning workflow for the Pima Diabetes benchmark:
 
-## The real problem
-Medical risk screening is asymmetric:
-- **False negatives** miss high-risk cases.
-- **False positives** increase follow-up cost and patient friction.
+```text
+EDA → leakage-safe preprocessing → model comparison → calibration → threshold policy → held-out test evaluation → exportable artifact
+```
 
-A model score is not enough; you need calibrated probabilities and an explicit threshold policy.
+The goal is not just to report a score. The goal is to show a reproducible workflow where preprocessing, evaluation, threshold selection, and artifact export are handled in a way that is easy to inspect and rerun.
 
-## Goals (definition of done)
-**Functional goals**
-- Clean the dataset (handle impossible zeros and missingness).
-- Train a strong baseline and a stronger model.
-- Calibrate probabilities to make thresholds meaningful.
-- Choose an operating threshold with a clear policy (default: cost-aware).
+## Problem framing
 
-**Engineering goals**
-- Reproducible analysis in a single notebook.
-- Export a reusable artifact bundle for inference.
+Binary medical-risk benchmarks are asymmetric by nature:
 
-## Approach
-### 1) Data integrity and preprocessing
-Several medical columns contain impossible zeros (e.g., glucose, BMI). The workflow:
-- converts impossible zeros to missing values
-- imputes missing values with robust statistics
-- keeps the target definition explicit (`Outcome`)
+- false negatives may miss diabetes-positive records
+- false positives increase follow-up burden
 
-### 2) Modeling and calibration
-The workflow trains a baseline and a stronger model, then applies probability calibration so scores behave like probabilities.
-This makes threshold selection defensible.
+For that reason, the notebook evaluates ranking quality, calibration, and threshold behavior instead of relying on accuracy alone.
 
-### 3) Decision policy (thresholding)
-Instead of using a default 0.5 threshold, the workflow selects an operating point.
-By default, it uses a simple cost curve:
-- higher cost for FN vs FP (configurable in the notebook)
+## Technical approach
 
-The selected threshold is exported with the artifact bundle so inference is consistent.
+### 1) Data integrity
+
+The notebook validates the expected Pima schema and inspects medically impossible zero values in columns such as `Glucose`, `BloodPressure`, `SkinThickness`, `Insulin`, and `BMI`.
+
+### 2) Leakage-safe preprocessing
+
+Zero-to-missing conversion, interaction features, median imputation, scaling, optional imbalance handling, and model fitting are kept inside the modeling pipeline. This prevents preprocessing statistics from leaking across validation or test boundaries.
+
+### 3) Model comparison and tuning
+
+The workflow compares baseline and stronger model candidates, then tunes selected models using inner cross-validation.
+
+### 4) Probability calibration
+
+The selected model is calibrated so that threshold analysis is based on probability-like scores rather than raw classifier outputs.
+
+### 5) Threshold policy
+
+The operating threshold is selected on the validation split only using an illustrative false-positive / false-negative cost setup. The held-out test set is used once for final reporting.
 
 ## Outputs
-The notebook exports a bundle to `./artifacts/pima_best_pipeline.joblib` containing:
-- the trained (calibrated) pipeline
-- the feature list used for scoring
-- the selected operating threshold
-- run metadata (cost settings, model name, CV summary)
 
-## Usage
-Execution steps are documented in `README.md`.
+The notebook exports `artifacts/pima_best_pipeline.joblib`, a bundle containing:
+
+- calibrated pipeline
+- selected operating threshold
+- feature list
+- model name
+- CV and tuning summaries
+- validation threshold summary
+- held-out test metrics
+- run metadata
 
 ## Limitations
-- This is a single-dataset workflow; generalization requires external validation.
-- Costs are illustrative; thresholds should be re-selected based on real operational costs.
-- Demographic/clinical shift over time can affect performance.
 
-## Next steps
-- Add external validation or a temporal split if new data is available.
-- Evaluate cost sensitivity (how decisions change with FP/FN costs).
-- Add simple monitoring hooks (drift checks on key features).
+- This is a benchmark workflow, not a clinical model.
+- Real-world use would require external validation on representative data.
+- The illustrative cost policy should be replaced with domain-approved decision costs before operational use.
+- Monitoring for calibration drift and population drift would be required in an operational setting.
+
+## Recommended next steps
+
+- Evaluate the workflow on additional representative data.
+- Test sensitivity to different threshold policies.
+- Add lightweight monitoring checks around input distributions, calibration, and output rates.
