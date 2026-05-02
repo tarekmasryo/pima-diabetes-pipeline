@@ -192,6 +192,6 @@ The output CSV adds:
 
 ---
 
-## 🧾 License
+## 📄 License
 
-MIT License for code. Dataset licensing depends on the original dataset source.
+This repository is released under the MIT License. See [`LICENSE`](LICENSE).
